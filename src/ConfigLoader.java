@@ -45,6 +45,10 @@ public class ConfigLoader extends AbstractLoader {
 
 		FileInputStream stream = new FileInputStream(getFile());
 
+		if (getFile().length() < 1) {
+			return ;
+		}
+
 		byte[] buffer = new byte[
 				(int) getFile().length()
 			];

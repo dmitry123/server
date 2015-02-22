@@ -48,6 +48,24 @@ public abstract class AbstractLoader extends HashMap<String, Object> implements 
 	}
 
 	/**
+	 * It will return default value if last not contains in this
+	 * hash map and put it to itself
+	 * @param key - Value's key
+	 * @param value - Default value to set
+	 * @param <T> - Type of set value
+	 * @return - Key's value from map or default value
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T getDefault(String key, T value) {
+		if (containsKey(key)) {
+			return ((T) get(key));
+		} else {
+			put(key, value);
+		}
+		return value;
+	}
+
+	/**
 	 * Override that method to return folder with files
 	 * for this loader
 	 * @return - Folder's name
