@@ -1,9 +1,32 @@
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class Request {
+
+	public enum Method {
+
+		DELETE,
+		PUT,
+		POST,
+		GET,
+		HEAD,
+		OPTIONS;
+
+		/**
+		 * Find method by it's name
+		 * @param method - Method name
+		 * @return - Method index or null
+		 */
+		static Method find(String method) {
+			for (Method m : Method.values()) {
+				if (m.toString().equalsIgnoreCase(method)) {
+					return m;
+				}
+			}
+			return null;
+		}
+	}
 
 	/**
 	 * Construct request with header array, it will parse all rows
@@ -88,15 +111,15 @@ public class Request {
 			int index;
 			for (String s : body.split(",")) {
 				index = s.indexOf(";");
-				AtomicReference<AcceptLanguage> language = new AtomicReference<AcceptLanguage>(new AcceptLanguage());
+				AcceptLanguage language = new AcceptLanguage();
 				if (index != -1) {
-					language.get().name = s.substring(0, index);
-					language.get().range = Integer.parseInt(s.substring(index + 1));
+					language.name = s.substring(0, index);
+					language.range = Integer.parseInt(s.substring(index + 1));
 				} else {
-					language.get().name = s;
-					language.get().range = 0;
+					language.name = s;
+					language.range = 0;
 				}
-				add(language.get());
+				add(language);
 			}
 		}
 
@@ -211,8 +234,6 @@ public class Request {
 
 		String[] array = string.split(" ");
 
-		System.out.println(string);
-
 		method = array[0];
 		path = array[1];
 		protocol = array[2];
@@ -228,14 +249,12 @@ public class Request {
 
 		int colon = string.indexOf(":");
 
-		String key = string.substring(0, colon);
-		String body = string.substring(colon + 1);
+		String key = string.substring(0, colon).trim();
+		String body = string.substring(colon + 1).trim();
 
-		if (parsers.containsKey(key)) {
-			try {
-				getParser(key).parse(body);
-			} catch (Exception ignored) {
-			}
+		try {
+			getParser(key).parse(body);
+		} catch (Exception ignored) {
 		}
 	}
 

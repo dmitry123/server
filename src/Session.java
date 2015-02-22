@@ -23,6 +23,8 @@ public class Session implements Runnable {
 	@Override
 	public void run() {
 		try {
+			System.out.println("Accepted Connection : " + socket.toString());
+
 			InputStream stream = socket.getInputStream();
 
 			byte[] chunk = new byte[
@@ -46,10 +48,24 @@ public class Session implements Runnable {
 				return ;
 			}
 
-			request = new Request(header);
+			Response response;
 
-		} catch (IOException e) {
-			e.printStackTrace();
+			if (header.length != 1) {
+				request = new Request(header);
+				response = getServer().getRequestListener().process(request);
+			} else {
+				response = new Response(ResponseCode.NO_CONTENT, "");
+			}
+
+			socket.getOutputStream().write(response.getResult());
+
+		} catch (Exception e) {
+			try {
+				socket.getOutputStream().write(new Response(
+					ResponseCode.INTERNAL_SERVER_ERROR, e.getMessage()
+				).getResult());
+			} catch (IOException ignored) {
+			}
 		}
 	}
 

@@ -1,5 +1,5 @@
 import java.net.ServerSocket;
-import java.net.Socket;
+import java.util.Timer;
 
 public class Server implements Runnable {
 
@@ -9,9 +9,12 @@ public class Server implements Runnable {
 	/**
 	 * Construct server
 	 */
-	public Server() {
+	public Server(RequestListener listener, String config) {
+
+		requestListener = listener;
+
 		try {
-			configLoader = new ConfigLoader("server");
+			configLoader = new ConfigLoader(config);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -30,17 +33,24 @@ public class Server implements Runnable {
 			ServerSocket serverSocket = new ServerSocket(
 				configLoader.getDefault("port", PORT)
 			);
-			Socket client;
 
-			while ((client = serverSocket.accept()) != null) {
-				new Thread(new Session(this, client)).start();
-			}
+			do {
+				new Thread(new Session(this, serverSocket.accept())).start();
+			} while (!serverSocket.isClosed());
 
-			configLoader.synchronize();
+			configLoader.synchronize(AbstractLoader.Precedence.FILE);
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Get server's request listener
+	 * @return - Request listener
+	 */
+	public RequestListener getRequestListener() {
+		return requestListener;
 	}
 
 	/**
@@ -51,5 +61,6 @@ public class Server implements Runnable {
 		return configLoader;
 	}
 
+	private RequestListener requestListener;
 	private ConfigLoader configLoader;
 }

@@ -47,7 +47,7 @@ public enum ResponseCode {
 	UNORDERED_COLLECTION(425, "Unordered Collection"),
 	UPGRADE_REQUIRED(426, "Upgrade Required"),
 	PRECONDITION_REQUIRED(428, "Precondition Required"),
-	TOO_MANY_REQUIREST(429, "Too Many Requests"),
+	TOO_MANY_REQUESTS(429, "Too Many Requests"),
 	REQUEST_HEADER_FIELDS_TOO_LARGE(431, "Request Header Fields Too Large"),
 	REQUESTED_HOST_UNAVAILABLE(434, "Requested Host Unavailable"),
 	RETRY_WITH(449, "Retry With"),
@@ -62,7 +62,7 @@ public enum ResponseCode {
 	VARIANT_ALSO_NEGOTIATES(506, "Variant Also Negotiates"),
 	INSUFFICIENT_STORAGE(507, "Insufficient Storage"),
 	LOOP_DETECTED(508, "Loop Detected"),
-	BANWIDTH_LIMIT_EXCEEDED(509, "Bandwidth Limit Exceeded"),
+	BANDWIDTH_LIMIT_EXCEEDED(509, "Bandwidth Limit Exceeded"),
 	NOT_EXTENDED(510, "Not Extended"),
 	NETWORK_AUTHENTICATION_REQUIRED(511, "Network Authentication Required");
 
@@ -74,6 +74,20 @@ public enum ResponseCode {
 	private ResponseCode(int code, String description) {
 		this.code = code;
 		this.description = description;
+	}
+
+	/**
+	 * Get response code enum by it's code
+	 * @param code - Response code
+	 * @return - Response code object instance
+	 */
+	static ResponseCode find(int code) {
+		for (ResponseCode rc : values()) {
+			if (rc.getCode() == code) {
+				return rc;
+			}
+		}
+		return null;
 	}
 
 	/**

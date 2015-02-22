@@ -110,6 +110,17 @@ public abstract class AbstractLoader extends HashMap<String, Object> implements 
 			map.putAll(this);
 		}
 
+		for (Entry<String, Object> entry : this.entrySet()) {
+			if (!map.containsKey(entry.getKey())) {
+				map.put(entry.getKey(), entry.getValue());
+			}
+		}
+		for (Entry<String, Object> entry : map.entrySet()) {
+			if (!containsKey(entry.getKey())) {
+				put(entry.getKey(), entry.getValue());
+			}
+		}
+
 		save(map);
 	}
 
