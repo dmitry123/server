@@ -51,8 +51,8 @@ public class Session implements Runnable {
 			Response response;
 
 			if (header.length != 1) {
-				request = new Request(header);
-				response = getServer().getRequestListener().process(request);
+				response = getServer().getRequestListener()
+					.process(server, new Request(header));
 			} else {
 				response = new Response(ResponseCode.NO_CONTENT, "");
 			}

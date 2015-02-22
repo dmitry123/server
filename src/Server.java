@@ -1,5 +1,4 @@
 import java.net.ServerSocket;
-import java.util.Timer;
 
 public class Server implements Runnable {
 
@@ -10,14 +9,12 @@ public class Server implements Runnable {
 	 * Construct server
 	 */
 	public Server(RequestListener listener, String config) {
-
-		requestListener = listener;
-
 		try {
 			configLoader = new ConfigLoader(config);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		requestListener = listener;
 	}
 
 	/**
