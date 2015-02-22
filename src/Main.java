@@ -24,7 +24,7 @@ public class Main {
 				stream.read(buffer);
 				stream.close();
 
-				return new Response(ResponseCode.OK, ContentType.IMAGE_JPEG, buffer, null);
+				return new Response(ResponseCode.OK, ContentType.TEXT_HTML, buffer, null);
 			}
 		}, "server").run();
 	}
