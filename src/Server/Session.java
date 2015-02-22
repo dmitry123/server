@@ -1,3 +1,5 @@
+package Server;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Socket;
@@ -25,7 +27,7 @@ public class Session implements Runnable {
 	@Override
 	public void run() {
 		try {
-			System.out.println("Accepted Connection : " + socket.toString());
+			System.out.println("Client Connection Accepted : " + socket.toString());
 
 			InputStream stream = socket.getInputStream();
 
@@ -51,8 +53,8 @@ public class Session implements Runnable {
 			Response response;
 
 			if (header.length != 1) {
-				response = getServer().getRequestListener()
-					.process(server, new Request(header));
+				response = getServer().getSessionListener()
+					.process(this);
 			} else {
 				response = new Response(ResponseCode.NO_CONTENT, "");
 			}

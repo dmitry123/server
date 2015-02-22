@@ -1,3 +1,5 @@
+package Core;
+
 import org.json.JSONObject;
 
 import java.io.FileInputStream;

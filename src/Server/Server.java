@@ -1,19 +1,29 @@
+package Server;
+
+import Core.AbstractLoader;
+import Core.ConfigLoader;
+import Core.EnvironmentManager;
+
 import java.net.ServerSocket;
 
-public class Server implements Runnable {
+public class Server extends Thread implements Runnable {
 
 	public static final int PORT = 9999;
 
 	/**
 	 * Construct server
 	 */
-	public Server(RequestListener listener, String config) {
+	public Server(SessionListener listener, String config) {
 		try {
 			configLoader = new ConfigLoader(config);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		requestListener = listener;
+		sessionListener = listener;
+		try {
+			serverTerminal = new ServerTerminal(getEnvironmentManager(), null);
+		} catch (Exception ignored) {
+		}
 	}
 
 	/**
@@ -30,6 +40,8 @@ public class Server implements Runnable {
 				configLoader.getDefault("port", PORT)
 			);
 
+			System.out.format("Starting Server At %d Port", serverSocket.getLocalPort());
+
 			do {
 				new Thread(new Session(this, serverSocket.accept())).start();
 			} while (!serverSocket.isClosed());
@@ -42,11 +54,22 @@ public class Server implements Runnable {
 	}
 
 	/**
+	 * Get server's environment manager
+	 * @return - Server's environment manager
+	 */
+	public EnvironmentManager getEnvironmentManager() {
+		return environmentManager;
+	}
+
+	private EnvironmentManager environmentManager
+		= new EnvironmentManager(this);
+
+	/**
 	 * Get server's request listener
 	 * @return - Request listener
 	 */
-	public RequestListener getRequestListener() {
-		return requestListener;
+	public SessionListener getSessionListener() {
+		return sessionListener;
 	}
 
 	/**
@@ -57,6 +80,15 @@ public class Server implements Runnable {
 		return configLoader;
 	}
 
-	private RequestListener requestListener;
+	/**
+	 * Get default server's terminal manager
+	 * @return - Server's terminal
+	 */
+	public ServerTerminal getServerTerminal() {
+		return serverTerminal;
+	}
+
+	private SessionListener sessionListener;
 	private ConfigLoader configLoader;
+	private ServerTerminal serverTerminal;
 }

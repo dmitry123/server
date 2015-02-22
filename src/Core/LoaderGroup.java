@@ -1,3 +1,5 @@
+package Core;
+
 import java.util.HashSet;
 
 public class LoaderGroup extends HashSet<Loader> implements Loader {
