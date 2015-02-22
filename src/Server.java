@@ -3,7 +3,6 @@ import java.net.ServerSocket;
 public class Server implements Runnable {
 
 	public static final int PORT = 9999;
-	public static final int CHUNK = 4096;
 
 	/**
 	 * Construct server

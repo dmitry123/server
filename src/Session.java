@@ -4,6 +4,8 @@ import java.net.Socket;
 
 public class Session implements Runnable {
 
+	public static final int CHUNK = 4096;
+
 	/**
 	 * Construct session with it's socket
 	 * @param socket - Client's socket
@@ -27,9 +29,7 @@ public class Session implements Runnable {
 
 			InputStream stream = socket.getInputStream();
 
-			byte[] chunk = new byte[
-					getServer().getConfigLoader().getDefault("chunk", Server.CHUNK)
-				];
+			byte[] chunk = new byte[CHUNK];
 			int bytes;
 
 			StringBuilder builder = new StringBuilder();
