@@ -21,7 +21,7 @@ public class ServerTerminal extends Station {
 	 * @throws Exception
 	 */
 	public ServerTerminal(EnvironmentManager environmentManager, Machine machine) throws Exception {
-		this(machine, null);
+		this(machine, null); this.environmentManager = environmentManager;
 	}
 
 	/**
@@ -35,6 +35,11 @@ public class ServerTerminal extends Station {
 			@Override
 			public void run(String[] arguments) throws Error, InterruptedException {
 				getMachine().getStack().clear(); throw new InterruptedException();
+			}
+			@Override
+			public String getDescription() {
+				return "That instruction will cleanup station machine" +
+					"stack and terminate it's thread";
 			}
 		});
 
@@ -51,6 +56,11 @@ public class ServerTerminal extends Station {
 					System.out.format(" + %s", s);
 				}
 			}
+			@Override
+			public String getDescription() {
+				return "Display log messages for some day, if day hasn't been set, " +
+					"then it will display log for current day";
+			}
 		});
 
 		register(new Instruction(this, "compile", "-c") {
@@ -66,6 +76,11 @@ public class ServerTerminal extends Station {
 				e.getManagerCollection().cleanup();
 				e.getProjectManager().getCompiler().compile();
 			}
+			@Override
+			public String getDescription() {
+				return "Compile project by it's name, also it will cleanup cache for" +
+					"project's environment";
+			}
 		});
 
 		register(new Instruction(this, "cleanup", "-r") {
@@ -79,6 +94,10 @@ public class ServerTerminal extends Station {
 					throw new Console.Error(this, "Unresolved project name (" + arguments[0] + ")");
 				}
 				e.getManagerCollection().cleanup();
+			}
+			@Override
+			public String getDescription() {
+				return "Remove all cached components for current project's environment";
 			}
 		});
 
@@ -98,6 +117,10 @@ public class ServerTerminal extends Station {
 							System.out.println(" + No sessions open");
 						}
 					}
+					@Override
+					public String getDescription() {
+						return "Display opened sessions for some environment";
+					}
 				});
 
 				register(new Instruction(this, "clear", "-c") {
@@ -108,6 +131,10 @@ public class ServerTerminal extends Station {
 						}
 						getEnvironmentManager().get(arguments[0])
 							.getSessionManager().getEmployeeHashMap().clear();
+					}
+					@Override
+					public String getDescription() {
+						return "Close sessions for some environment";
 					}
 				});
 
@@ -126,6 +153,10 @@ public class ServerTerminal extends Station {
 							}
 						}
 					}
+					@Override
+					public String getDescription() {
+						return "Drop session from some environment by user's login";
+					}
 				});
 
 				register(new Instruction(this, "save", "-sf") {
@@ -135,6 +166,10 @@ public class ServerTerminal extends Station {
 							throw new Console.Error(this, "That instruction can assume only two arguments");
 						}
 						getEnvironmentManager().get(arguments[0]).getSessionManager().save();
+					}
+					@Override
+					public String getDescription() {
+						return "Save session for some environment";
 					}
 				});
 
@@ -146,7 +181,20 @@ public class ServerTerminal extends Station {
 						}
 						getEnvironmentManager().get(arguments[0]).getSessionManager().load();
 					}
+					@Override
+					public String getDescription() {
+						return "Load session from filesystem for some environment";
+					}
 				});
+			}
+
+			/**
+			 * @return - Instruction description
+			 */
+			@Override
+			public String getDescription() {
+				return "That station will provide some operations with sessions, likes " +
+					"saving, erasing, loading etc";
 			}
 
 			@Override

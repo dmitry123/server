@@ -6,12 +6,21 @@ import java.util.*;
 public class Response {
 
 	/**
+	 * Construct response with only response code for error or something else
+	 * @param responseCode - Server response code
+	 */
+	public Response(ResponseCode responseCode) {
+		this(responseCode, "");
+	}
+
+	/**
 	 * Construct response with response code and html text
 	 * @param responseCode - Server response code
 	 * @param responseMessage - Response message
 	 */
 	public Response(ResponseCode responseCode, String responseMessage) {
-		this(responseCode, ContentType.TEXT_HTML, responseMessage.getBytes(), null);
+		this(responseCode, ContentType.TEXT_HTML,
+			responseMessage != null ? responseMessage.getBytes() : "null".getBytes(), null);
 	}
 
 	/**

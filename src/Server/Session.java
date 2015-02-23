@@ -2,6 +2,7 @@ package Server;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 
 public class Session implements Runnable {
@@ -26,17 +27,20 @@ public class Session implements Runnable {
 	 */
 	@Override
 	public void run() {
-		try {
-			System.out.println("Client Connection Accepted : " + socket.toString());
 
-			InputStream stream = socket.getInputStream();
+		OutputStream output = null;
+		InputStream input = null;
+
+		try {
+			input = socket.getInputStream();
+			output = socket.getOutputStream();
 
 			byte[] chunk = new byte[CHUNK];
 			int bytes;
 
 			StringBuilder builder = new StringBuilder();
 
-			while ((bytes = stream.read(chunk)) == chunk.length) {
+			while ((bytes = input.read(chunk)) == chunk.length) {
 				builder.append(new String(chunk, 0, bytes));
 			}
 
@@ -50,6 +54,8 @@ public class Session implements Runnable {
 				return ;
 			}
 
+			request = new Request(header);
+
 			Response response;
 
 			if (header.length != 1) {
@@ -59,15 +65,31 @@ public class Session implements Runnable {
 				response = new Response(ResponseCode.NO_CONTENT, "");
 			}
 
-			socket.getOutputStream().write(response.getResult());
+			output.write(response.getResult());
 
 		} catch (Exception e) {
 			try {
-				socket.getOutputStream().write(new Response(
-					ResponseCode.INTERNAL_SERVER_ERROR, e.getMessage()
+				if (output == null) {
+					output = socket.getOutputStream();
+				}
+				output.write(new Response(
+						ResponseCode.INTERNAL_SERVER_ERROR, e.getMessage()
 				).getResult());
 			} catch (IOException ignored) {
 			}
+		}
+
+		try {
+			if (input != null) {
+				input.close();
+			}
+			if (output != null) {
+				output.close();
+			}
+			if (!socket.isClosed()) {
+				socket.close();
+			}
+		} catch (Exception ignored) {
 		}
 	}
 

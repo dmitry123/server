@@ -40,14 +40,19 @@ public abstract class Station extends Instruction implements Protocol {
 
 		register(new Instruction(this, "exit", "-e") {
 			@Override
-			public void run(String[] arguments) throws Exception, InterruptedException {
+			public void run(String[] arguments) throws Exception {
 				throw new InterruptedException();
+			}
+			@Override
+			public String getDescription() {
+				return "Close current station, if station is root, then it will" +
+					"terminate station's thread";
 			}
 		});
 
 		register(new Instruction(this, "help", "-h") {
 			@Override
-			public void run(String[] arguments) throws Exception, InterruptedException {
+			public void run(String[] arguments) throws Exception {
 				if (arguments.length != 0) {
 					if (arguments.length != 1) {
 						throw new Error(this,
@@ -64,6 +69,11 @@ public abstract class Station extends Instruction implements Protocol {
 						getAbout(i);
 					}
 				}
+			}
+			@Override
+			public String getDescription() {
+				return "Display information about all instructions with it's" +
+					"usage, short tags and description";
 			}
 		});
 	}

@@ -1,10 +1,14 @@
 package Server;
 
+import Console.Machine;
 import Core.AbstractLoader;
 import Core.ConfigLoader;
 import Core.EnvironmentManager;
 
+import java.io.IOException;
+import java.io.InterruptedIOException;
 import java.net.ServerSocket;
+import java.net.SocketException;
 
 public class Server extends Thread implements Runnable {
 
@@ -19,9 +23,15 @@ public class Server extends Thread implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		sessionListener = listener;
+		if (listener == null) {
+			sessionListener = new DefaultListener();
+		} else {
+			sessionListener = listener;
+		}
 		try {
-			serverTerminal = new ServerTerminal(getEnvironmentManager(), null);
+			serverTerminal = new ServerTerminal(getEnvironmentManager(),
+				new Machine()
+			);
 		} catch (Exception ignored) {
 		}
 	}
@@ -36,21 +46,46 @@ public class Server extends Thread implements Runnable {
 	@Override
 	public void run() {
 		try {
-			ServerSocket serverSocket = new ServerSocket(
+			serverSocket = new ServerSocket(
 				configLoader.getDefault("port", PORT)
 			);
 
-			System.out.format("Starting Server At %d Port", serverSocket.getLocalPort());
+			System.out.format("Starting Server At %d Port\n", serverSocket.getLocalPort());
+
+			if (serverSocket.isClosed()) {
+				throw new Exception("Can't open server socket");
+			}
 
 			do {
-				new Thread(new Session(this, serverSocket.accept())).start();
+				try {
+					new Thread(new Session(this, serverSocket.accept())).start();
+				} catch (InterruptedIOException ignored) {
+					break;
+				} catch (SocketException ignored) {
+					break;
+				}
 			} while (!serverSocket.isClosed());
 
 			configLoader.synchronize(AbstractLoader.Precedence.FILE);
 
+			System.out.println("Closing Server");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Interrupt server working process and terminate it's
+	 * thread
+	 */
+	@Override
+	public void interrupt() {
+		try {
+			getServerSocket().close();
+		} catch (IOException ignored) {
+		}
+		super.interrupt();
 	}
 
 	/**
@@ -88,7 +123,16 @@ public class Server extends Thread implements Runnable {
 		return serverTerminal;
 	}
 
+	/**
+	 * Get server's socket
+	 * @return - Server's socket
+	 */
+	public ServerSocket getServerSocket() {
+		return serverSocket;
+	}
+
 	private SessionListener sessionListener;
 	private ConfigLoader configLoader;
 	private ServerTerminal serverTerminal;
+	private ServerSocket serverSocket;
 }

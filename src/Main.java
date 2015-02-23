@@ -11,9 +11,17 @@ import java.io.FileInputStream;
 public class Main implements SessionListener {
 
 	public static void main(String[] arguments) throws Exception {
-		Server server = new Server(new Main(), "server");
+		Server server = new Server(null, "server");
 		server.start();
-		server.getServerTerminal().work();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException ignored) {
+		}
+		server.getServerTerminal().getMachine().register(
+			"terminal", server.getServerTerminal()
+		);
+		server.getServerTerminal().getMachine().start();
+		server.interrupt();
 	}
 
 	/**

@@ -16,7 +16,7 @@ public enum ContentType {
 	TEXT_CSV        ("text/csv", ".csv"),
 	TEXT_HTML       ("text/html", ".html"),
 	TEXT_JAVASCRIPT ("text/javascript", ".js"),
-	TEXT_PLAIN      ("text/plain"),
+	TEXT_PLAIN      ("text/plain", ".txt"),
 	TEXT_PHP        ("text/php", ".php"),
 	TEXT_XML        ("text/xml", ".xml"),
 
