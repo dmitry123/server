@@ -3,6 +3,7 @@ package Core;
 import Sql.Connection;
 import Server.Server;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,13 +44,15 @@ public class EnvironmentManager {
 			return hashMap.get(name);
 		}
 		// Create new environment
-		Environment e = new Environment(server, new Connection(), name);
+		Environment environment = new Environment(
+			server, null, name
+		);
 		// Restore all saved sessions
-		e.getSessionManager().load();
+		environment.getSessionManager().load();
 		// Put to hash map
-		hashMap.put(name, e);
+		hashMap.put(name, environment);
 		// Return instance
-		return e;
+		return environment;
 	}
 
 	/**

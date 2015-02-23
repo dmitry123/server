@@ -14,7 +14,7 @@ public enum ContentType {
 	TEXT_CMD        ("text/cmd"),
 	TEXT_CSS        ("text/css", ".css"),
 	TEXT_CSV        ("text/csv", ".csv"),
-	TEXT_HTML       ("text/html", ".html"),
+	TEXT_HTML       ("text/html", ".html", ".vm"),
 	TEXT_JAVASCRIPT ("text/javascript", ".js"),
 	TEXT_PLAIN      ("text/plain", ".txt"),
 	TEXT_PHP        ("text/php", ".php"),

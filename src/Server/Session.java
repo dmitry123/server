@@ -1,5 +1,7 @@
 package Server;
 
+import Core.Environment;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -91,6 +93,18 @@ public class Session implements Runnable {
 			}
 		} catch (Exception ignored) {
 		}
+	}
+
+	/**
+	 * Get null environment
+	 * @return - Null environment
+	 */
+	public Environment getNullEnvironment() {
+		try {
+			return getServer().getEnvironmentManager().get("<null>");
+		} catch (Exception ignored) {
+		}
+		return null;
 	}
 
 	/**

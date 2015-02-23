@@ -59,9 +59,7 @@ public class Server extends Thread implements Runnable {
 			do {
 				try {
 					new Thread(new Session(this, serverSocket.accept())).start();
-				} catch (InterruptedIOException ignored) {
-					break;
-				} catch (SocketException ignored) {
+				} catch (InterruptedIOException | SocketException ignored) {
 					break;
 				}
 			} while (!serverSocket.isClosed());

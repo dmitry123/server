@@ -1,5 +1,8 @@
 package Server;
 
+import Core.EnvironmentManager;
+import Core.VelocityRender;
+
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -30,6 +33,10 @@ public class DefaultListener implements SessionListener {
 		stream.close();
 
 		ContentType contentType = ContentType.findByExtension(getFileExtension(file.getName()));
+
+		if (getFileExtension(file.getName()).equals(".vm")) {
+			buffer = new VelocityRender(session.getNullEnvironment()).render(file.getName()).getBytes();
+		}
 
 		if (contentType != null) {
 			return new Response(ResponseCode.OK, contentType, buffer, null);

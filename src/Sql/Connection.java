@@ -43,13 +43,9 @@ public class Connection {
 	 * @throws Exception
 	 */
     public Connection(String host, String user, String password) throws Exception {
-		try {
-			sqlConnection = DriverManager.getConnection(host + "?user=" + user + "&password=" + password);
-		} catch (SQLException e) {
-			throw new Exception(
-				"Connection() : \"" + e.getMessage() + "\""
-			);
-		}
+		sqlConnection = DriverManager.getConnection(
+			host + "?user=" + user + "&password=" + password
+		);
 	}
 
 	/**
@@ -59,16 +55,10 @@ public class Connection {
 	 * @throws Exception
 	 */
 	public PreparedStatement createStatementForSelect(String sql) throws Exception {
-		try {
-			return sqlConnection.prepareStatement(sql,
-				ResultSet.TYPE_SCROLL_INSENSITIVE,
-				ResultSet.CONCUR_READ_ONLY
-			);
-		} catch (SQLException e) {
-			throw new Exception(
-				"Connection/createStatementForSelect() : \"" + e.getMessage() + "\""
-			);
-		}
+		return sqlConnection.prepareStatement(sql,
+			ResultSet.TYPE_SCROLL_INSENSITIVE,
+			ResultSet.CONCUR_READ_ONLY
+		);
 	}
 
 	/**
@@ -78,15 +68,9 @@ public class Connection {
 	 * @throws Exception
 	 */
 	public PreparedStatement createStatementForInsert(String sql) throws Exception {
-		try {
-			return sqlConnection.prepareStatement(sql,
-				Statement.RETURN_GENERATED_KEYS
-			);
-		} catch (SQLException e) {
-			throw new Exception(
-				"Connection/createStatementForInsert() : \"" + e.getMessage() + "\""
-			);
-		}
+		return sqlConnection.prepareStatement(sql,
+			Statement.RETURN_GENERATED_KEYS
+		);
 	}
 
 	/**

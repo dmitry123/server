@@ -7,11 +7,13 @@ public class Cookie {
 
 	public static class Node {
 
-		private String name;
-		private String value;
-		private String expires;
-		private String path;
-
+		/**
+		 * Construct cookie's node with name value and other parameters
+		 * @param name - Name of cookie
+		 * @param value - Cookie's value
+		 * @param expires - Days to expire
+		 * @param path - Server's working path
+		 */
 		public Node(String name, String value, String expires, String path) {
 			this.name = name;
 			this.value = value;
@@ -29,6 +31,11 @@ public class Cookie {
 				name, value, expires, path
 			);
 		}
+
+		private String name;
+		private String value;
+		private String expires;
+		private String path;
 	}
 
 	/**

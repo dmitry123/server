@@ -273,7 +273,7 @@ public abstract class Controller extends Component {
 	 * @throws Exception
 	 */
 	public void renderVm(String action) throws Exception {
-		renderVm(action, new HashMap<String, Object>());
+		renderVm(action, new HashMap<>());
 	}
 
 	/**
@@ -392,13 +392,13 @@ public abstract class Controller extends Component {
 		hashData.put("url", "/" + getEnvironment().getProjectName());
 		hashData.put("this", this);
 
-		loadVm(getVmPath("common", "header"), new HashMap<String, Object>());
+		loadVm(getVmPath("common", "header"), new HashMap<>());
 
 		loadVm(getVmPath(getClass().getName().substring(
 				getClass().getName().lastIndexOf('.') + 1
 		), action), hashData);
 
-		loadVm(getVmPath("common", "footer"), new HashMap<String, Object>());
+		loadVm(getVmPath("common", "footer"), new HashMap<>());
 	}
 
 	/**

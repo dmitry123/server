@@ -2,6 +2,8 @@ package Core;
 
 import Sql.Connection;
 import java.io.File;
+import java.sql.SQLException;
+
 import Server.Server;
 
 /**
@@ -17,8 +19,12 @@ public class Environment {
 	 */
 	public Environment(Server server, Connection connection, String projectName) throws Exception {
 
-		if (connection == null || connection.isClosed()) {
-			connection = new Connection();
+		try {
+			if (connection == null || connection.isClosed()) {
+				connection = new Connection();
+			}
+		} catch (SQLException ignored) {
+			connection = null;
 		}
 
 		if (projectName.endsWith("\\") || projectName.endsWith("/")) {
