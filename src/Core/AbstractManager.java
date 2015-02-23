@@ -32,11 +32,9 @@ public class AbstractManager<C extends Component> extends Extension {
 					Environment.class
 				).newInstance(getEnvironment());
 			}
-		} catch (InstantiationException ignored) {
-		} catch (IllegalAccessException ignored) {
+		} catch (InstantiationException | IllegalAccessException | NoSuchMethodException ignored) {
 		} catch (InvocationTargetException e) {
 			throw new Exception(e.getCause().getMessage());
-		} catch (NoSuchMethodException ignored) {
 		}
 
 		String binaryPath = type.getBinaryPath(

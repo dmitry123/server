@@ -101,7 +101,7 @@ public abstract class AbstractLoader extends HashMap<String, Object> implements 
 	 */
 	public final synchronized void synchronize(Precedence precedence) throws Exception {
 
-		Map<String, Object> map = new HashMap<String, Object>();
+		Map<String, Object> map = new HashMap<>();
 
 		load(map);
 
@@ -117,11 +117,9 @@ public abstract class AbstractLoader extends HashMap<String, Object> implements 
 				map.put(entry.getKey(), entry.getValue());
 			}
 		}
-		for (Entry<String, Object> entry : map.entrySet()) {
-			if (!containsKey(entry.getKey())) {
-				put(entry.getKey(), entry.getValue());
-			}
-		}
+		map.entrySet().stream().filter(entry -> !containsKey(entry.getKey())).forEach(
+			entry -> put(entry.getKey(), entry.getValue())
+		);
 
 		save(map);
 	}

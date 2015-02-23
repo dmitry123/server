@@ -615,14 +615,6 @@ public abstract class Controller extends Component {
 	}
 
 	/**
-	 * Get html builder
-	 * @return - Html builder
-	 */
-	public HtmlBuilder getHtmlBuilder() {
-		return htmlBuilder;
-	}
-
-	/**
 	 * @return - Ajax response string (JSON)
 	 */
 	public String getAjaxResponse() {
@@ -638,7 +630,6 @@ public abstract class Controller extends Component {
 	}
 
 	private Server.Session session = null;
-	private HtmlBuilder htmlBuilder = new HtmlBuilder();
 	private Model model = null;
 	private View view  = null;
 	private String ajaxResponse = null;

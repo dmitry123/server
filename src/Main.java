@@ -3,6 +3,11 @@ import java.io.*;
 
 public class Main implements SessionListener {
 
+	/**
+	 * Application entry point
+	 * @param arguments - Argument list
+	 * @throws Exception
+	 */
 	public static void main(String[] arguments) throws Exception {
 		Server server = new Server(null, "server");
 		server.start();
