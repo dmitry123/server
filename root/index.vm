@@ -8,9 +8,19 @@
 </head>
 <script type="text/javascript" src="index.js"></script>
 <body>
-#set($result = $left + $right)
-<h1>Post Data : "${result}"</h1>
-<form method="post" action="index.vm">
+<h1>GET</h1>
+<ul>
+	#foreach ($entry in $request.getQueryParameters().entrySet())
+		<li><b>$entry.key</b> $entry.value</li>
+	#end
+</ul>
+<h1>POST</h1>
+<ul>
+	#foreach ($entry in $request.getPostParameters().entrySet())
+        <li><b>$entry.key</b> $entry.value</li>
+	#end
+</ul>
+<form method="post" action="index.vm?value=123&next=321">
 	<input name="left" type="text" value="Hello, ">
     <input name="right" type="text" value="World">
 	<input type="submit" value="Concretize">

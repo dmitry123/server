@@ -4,6 +4,7 @@ import Core.VelocityRender;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.HashMap;
 
 public class DefaultListener implements SessionListener {
 
@@ -34,7 +35,9 @@ public class DefaultListener implements SessionListener {
 		ContentType contentType = ContentType.findByExtension(getFileExtension(file.getName()));
 
 		if (getFileExtension(file.getName()).equals(".vm")) {
-			buffer = new VelocityRender(session.getNullEnvironment()).render(file.getName(), session.getRequest().getPostParametersEx()).getBytes();
+			buffer = new VelocityRender(session.getNullEnvironment()).render(file.getName(), new HashMap<String, Object>() {{
+				put("request", session.getRequest());
+			}}).getBytes();
 		}
 
 		if (contentType != null) {
