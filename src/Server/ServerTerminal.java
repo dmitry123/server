@@ -38,8 +38,32 @@ public class ServerTerminal extends Station {
 			}
 			@Override
 			public String getDescription() {
-				return "That instruction will cleanup station machine" +
+				return "That instruction will cleanup station machine " +
 					"stack and terminate it's thread";
+			}
+			@Override
+			public String getUsage() {
+				return "kill";
+			}
+		});
+
+		register(new Instruction(this, "list", "-a") {
+			@Override
+			public void run(String[] arguments) throws Exception {
+				for (String key : getEnvironmentManager().getMap().keySet()) {
+					System.out.println(" + " + key);
+				}
+				if (getEnvironmentManager().getMap().size() == 0) {
+					System.out.println(" + No Active Environments");
+				}
+			}
+			@Override
+			public String getDescription() {
+				return "List all active server's environments";
+			}
+			@Override
+			public String getUsage() {
+				return "list";
 			}
 		});
 
@@ -59,7 +83,12 @@ public class ServerTerminal extends Station {
 			@Override
 			public String getDescription() {
 				return "Display log messages for some day, if day hasn't been set, " +
-					"then it will display log for current day";
+					"then it will display log for current day. Date format is " +
+					"Y-m-d, like 2015-02-20";
+			}
+			@Override
+			public String getUsage() {
+				return "log [<date>]";
 			}
 		});
 
@@ -81,6 +110,10 @@ public class ServerTerminal extends Station {
 				return "Compile project by it's name, also it will cleanup cache for" +
 					"project's environment";
 			}
+			@Override
+			public String getUsage() {
+				return "compile <environment>";
+			}
 		});
 
 		register(new Instruction(this, "cleanup", "-r") {
@@ -98,6 +131,10 @@ public class ServerTerminal extends Station {
 			@Override
 			public String getDescription() {
 				return "Remove all cached components for current project's environment";
+			}
+			@Override
+			public String getUsage() {
+				return "cleanup <environment>";
 			}
 		});
 
@@ -121,6 +158,10 @@ public class ServerTerminal extends Station {
 					public String getDescription() {
 						return "Display opened sessions for some environment";
 					}
+					@Override
+					public String getUsage() {
+						return "show <environment>";
+					}
 				});
 
 				register(new Instruction(this, "clear", "-c") {
@@ -135,6 +176,10 @@ public class ServerTerminal extends Station {
 					@Override
 					public String getDescription() {
 						return "Close sessions for some environment";
+					}
+					@Override
+					public String getUsage() {
+						return "clear <environment>";
 					}
 				});
 
@@ -157,6 +202,10 @@ public class ServerTerminal extends Station {
 					public String getDescription() {
 						return "Drop session from some environment by user's login";
 					}
+					@Override
+					public String getUsage() {
+						return "drop <environment> <login>";
+					}
 				});
 
 				register(new Instruction(this, "save", "-sf") {
@@ -170,6 +219,10 @@ public class ServerTerminal extends Station {
 					@Override
 					public String getDescription() {
 						return "Save session for some environment";
+					}
+					@Override
+					public String getUsage() {
+						return "save <environment>";
 					}
 				});
 
@@ -185,6 +238,10 @@ public class ServerTerminal extends Station {
 					public String getDescription() {
 						return "Load session from filesystem for some environment";
 					}
+					@Override
+					public String getUsage() {
+						return "load <environment>";
+					}
 				});
 			}
 
@@ -195,6 +252,11 @@ public class ServerTerminal extends Station {
 			public String getDescription() {
 				return "That station will provide some operations with sessions, likes " +
 					"saving, erasing, loading etc";
+			}
+
+			@Override
+			public String getUsage() {
+				return "session";
 			}
 
 			@Override

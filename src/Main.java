@@ -1,12 +1,5 @@
-import Server.Response;
-import Server.ResponseCode;
-import Server.Server;
-import Server.Session;
-import Server.SessionListener;
-import Server.ContentType;
-
-import java.io.File;
-import java.io.FileInputStream;
+import Server.*;
+import java.io.*;
 
 public class Main implements SessionListener {
 

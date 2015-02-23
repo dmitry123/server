@@ -20,7 +20,7 @@ public class EnvironmentManager {
 		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
 			@Override
 			public void run() {
-				for (Map.Entry<String, Environment> i : EnvironmentManager.this.getHashMap().entrySet()) {
+				for (Map.Entry<String, Environment> i : EnvironmentManager.this.getMap().entrySet()) {
 					try {
 						i.getValue().getSessionManager().save();
 					} catch (Exception ignored) {
@@ -56,7 +56,7 @@ public class EnvironmentManager {
 	 * Get map with declared environments
 	 * @return - Map with environments
 	 */
-	public HashMap<String, Environment> getHashMap() {
+	public Map<String, Environment> getMap() {
 		return hashMap;
 	}
 

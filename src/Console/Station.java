@@ -4,7 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by Savonin on 2014-11-15
@@ -48,6 +49,10 @@ public abstract class Station extends Instruction implements Protocol {
 				return "Close current station, if station is root, then it will" +
 					"terminate station's thread";
 			}
+			@Override
+			public String getUsage() {
+				return "exit";
+			}
 		});
 
 		register(new Instruction(this, "help", "-h") {
@@ -74,6 +79,10 @@ public abstract class Station extends Instruction implements Protocol {
 			public String getDescription() {
 				return "Display information about all instructions with it's" +
 					"usage, short tags and description";
+			}
+			@Override
+			public String getUsage() {
+				return "help <cmd>";
 			}
 		});
 	}
@@ -210,8 +219,8 @@ public abstract class Station extends Instruction implements Protocol {
 		return machine;
 	}
 
-	private HashMap<String, Protocol> hashMap
-			= new HashMap<String, Protocol>();
+	private Map<String, Protocol> hashMap
+			= new LinkedHashMap<String, Protocol>();
 
 	private Machine machine;
 	private Station parent;

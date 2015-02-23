@@ -17,7 +17,7 @@ public class DefaultListener implements SessionListener {
 		File file = new File(folder + session.getRequest().getPath());
 
 		if (!file.exists()) {
-			return new Response(ResponseCode.NOT_FOUND, "Can't find file \"" + file.getPath() + "\"");
+			return new Response(ResponseCode.NOT_FOUND, "Can't find file \"" + file.getName() + "\"");
 		}
 
 		FileInputStream stream = new FileInputStream(file);
