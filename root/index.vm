@@ -8,6 +8,12 @@
 </head>
 <script type="text/javascript" src="index.js"></script>
 <body>
-<h1>Hello Test</h1>
+#set($result = $left + $right)
+<h1>Post Data : "${result}"</h1>
+<form method="post" action="index.vm">
+	<input name="left" type="text" value="Hello, ">
+    <input name="right" type="text" value="World">
+	<input type="submit" value="Concretize">
+</form>
 </body>
 </html>

@@ -30,6 +30,7 @@ public class Session implements Runnable {
 	@Override
 	public void run() {
 
+		Response response = null;
 		OutputStream output = null;
 		InputStream input = null;
 
@@ -58,13 +59,16 @@ public class Session implements Runnable {
 
 			request = new Request(header);
 
-			Response response;
+			if (request.getMethod() == null) {
+				response = new Response(ResponseCode.METHOD_NOT_ALLOWED);
+			}
 
-			if (header.length != 1) {
-				response = getServer().getSessionListener()
-					.process(this);
-			} else {
-				response = new Response(ResponseCode.NO_CONTENT, "");
+			if (response == null) {
+				if (header.length != 1) {
+					response = getServer().getSessionListener().process(this);
+				} else {
+					response = new Response(ResponseCode.NO_CONTENT, "");
+				}
 			}
 
 			output.write(response.getResult());

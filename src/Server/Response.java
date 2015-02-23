@@ -10,7 +10,7 @@ public class Response {
 	 * @param responseCode - Server response code
 	 */
 	public Response(ResponseCode responseCode) {
-		this(responseCode, "");
+		this(responseCode, !responseCode.equals(ResponseCode.NO_CONTENT) ? responseCode.getDescription() : "");
 	}
 
 	/**
