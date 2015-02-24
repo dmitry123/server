@@ -166,9 +166,9 @@ public class Session implements Runnable {
 	 */
 	private Response parseHeader(String message, byte[] body) throws Exception {
 
-		System.out.println("\n--------------");
+		System.out.println("-----------------------");
 		System.out.println(message);
-		System.out.println("--------------");
+		System.out.println("-----------------------");
 
 		if (message.equals("")) {
 			return new Response(ResponseCode.NO_CONTENT, "");
@@ -189,7 +189,7 @@ public class Session implements Runnable {
 		if (Request.Method.POST.equals(request.getMethod()) ||
 			Request.Method.PUT.equals(request.getMethod())
 		) {
-			if ("multipart/form-data".equalsIgnoreCase(request.getContentType().getName())) {
+			if (request.getContentType().getName().equalsIgnoreCase("multipart/form-data")) {
 				if (request.getContentType().containsKey("boundary")) {
 					parseMultipartData(body, request.getContentType().get("boundary"));
 				} else {

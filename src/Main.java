@@ -7,6 +7,7 @@ public class Main implements SessionListener {
 	 * @param arguments - Argument list
 	 * @throws Exception
 	 */
+	@SuppressWarnings({"unchecked", "ConstantConditions"})
 	public static void main(String[] arguments) throws Exception {
 		Server server = new Server(null, "server");
 		server.start();
