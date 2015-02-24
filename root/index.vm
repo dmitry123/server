@@ -9,53 +9,47 @@
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="index.js"></script>
 <body>
-<h1>GET</h1>
+<h1>Uploaded Files</h1>
 <ul>
-	#foreach ($entry in $request.getQueryParameters().entrySet())
-		<li><b>$entry.key</b> $entry.value</li>
-	#end
-</ul>
-<h1>POST</h1>
-<ul>
-	#foreach ($entry in $request.getPostParameters().entrySet())
-        <li><b>$entry.key</b> $entry.value</li>
+	#foreach ($file in $request.getPostFiles())
+        <li><b>$file.getFileName()</b></li>
 	#end
 </ul>
 <form id="test-form" method="post" enctype="multipart/form-data" action="index.vm">
 	<input type="text" value="Hello, World" name="value">
     <input type="text" value="ASdasd" name="test">
-	<input type="file" accept="*/*" name="file">
+	<input type="file" accept="*/*" name="file" multiple>
 	<input type="submit" value="Concretize">
 </form>
 </body>
 <script>
-$(document).ready(function() {
-	$("#test-form").submit(function(e) {
-		$.ajax({
-			url: $(this).attr("action"),
-			type: "POST",
-			data: new FormData(this),
-			xhr: function() {
-				var xhr = $.ajaxSettings.xhr();
-				if (xhr.upload) {
-					xhr.upload.addEventListener("progress", function(e) {
-						console.log(e.loaded + "/" + e.total);
-					}, false);
-				}
-				return xhr;
-			},
-			success: function(e) {
-				console.log(e);
-			},
-			error: function(e) {
-				console.log(e);
-			},
-			contentType: false,
-			cache: false,
-			processData: false
-		});
-		e.preventDefault();
-	});
-});
+//$(document).ready(function() {
+//	$("#test-form").submit(function(e) {
+//		$.ajax({
+//			url: $(this).attr("action"),
+//			type: "POST",
+//			data: new FormData(this),
+//			xhr: function() {
+//				var xhr = $.ajaxSettings.xhr();
+//				if (xhr.upload) {
+//					xhr.upload.addEventListener("progress", function(e) {
+//						console.log(e.loaded + "/" + e.total);
+//					}, false);
+//				}
+//				return xhr;
+//			},
+//			success: function(e) {
+//				console.log(e);
+//			},
+//			error: function(e) {
+//				console.log(e);
+//			},
+//			contentType: false,
+//			cache: false,
+//			processData: false
+//		});
+//		e.preventDefault();
+//	});
+//});
 </script>
 </html>

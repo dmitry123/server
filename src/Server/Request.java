@@ -2,10 +2,7 @@ package Server;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Request {
 
@@ -50,29 +47,6 @@ public class Request {
 		if (getHeader().containsKey("X-Requested-With")) {
 			isAjax = getHeader().get("X-Requested-With").equals("XMLHttpRequest");
 		}
-	}
-
-	/**
-	 * Check is request sent via XMLHttpRequest
-	 * @return - True is request is ajax
-	 */
-	public boolean isAjax() {
-		return isAjax;
-	}
-
-	private boolean isAjax = false;
-
-	/**
-	 * Get special parser for specific
-	 * @param key - Header row's key
-	 * @return - Row's parser
-	 * @throws Exception
-	 */
-	public Parser getParser(String key) throws Exception {
-		if (parsers.containsKey(key)) {
-			return parsers.get(key);
-		}
-		throw new Exception("Unresolved header's row parser \"" + key + "\"");
 	}
 
 	/**
@@ -155,9 +129,25 @@ public class Request {
 		String key = string.substring(0, colon).trim();
 		String body = string.substring(colon + 1).trim();
 
-		try {
-			getParser(key).parse(body);
-		} catch (Exception ignored) {
+		if (key.equalsIgnoreCase("Content-Type")) {
+			StringTokenizer tokenizer = new StringTokenizer(body, ";");
+			String str; int index;
+			if (tokenizer.hasMoreTokens()) {
+				contentType.name = tokenizer.nextToken().trim();
+			}
+			while (tokenizer.hasMoreTokens()) {
+				if ((index = (str = tokenizer.nextToken().trim()).indexOf('=')) != -1) {
+					contentType.put(str.substring(0, index), str.substring(index + 1));
+				}
+			}
+		} else if (key.equalsIgnoreCase("Cookie")) {
+			StringTokenizer tokenizer = new StringTokenizer(body, ";");
+			String str; int index;
+			while (tokenizer.hasMoreTokens()) {
+				if ((index = (str = tokenizer.nextToken().trim()).indexOf('=')) != -1) {
+					cookie.put(str.substring(0, index), str.substring(index + 1));
+				}
+			}
 		}
 
 		header.put(key, body);
@@ -253,54 +243,6 @@ public class Request {
 	}
 
 	/**
-	 * Get collection with cache control header
-	 * @return - Cache control parser
-	 */
-	public CacheControl getCacheControl() {
-		return ((CacheControl) parsers.get("Cache-Control"));
-	}
-
-	/**
-	 * Get collection with accept header
-	 * @return - Accept parser
-	 */
-	public Accept getAccept() {
-		return ((Accept) parsers.get("Accept"));
-	}
-
-	/**
-	 * Get collection with accept encodings
-	 * @return - Accept encoding parser
-	 */
-	public AcceptEncoding getAcceptEncoding() {
-		return ((AcceptEncoding) parsers.get("Accept-Encoding"));
-	}
-
-	/**
-	 * Get collection with accept languages
-	 * @return - Accept language parser
-	 */
-	public AcceptLanguage getAcceptLanguage() {
-		return ((AcceptLanguage) parsers.get("Accept-Language"));
-	}
-
-	/**
-	 * Get collection with cookies
-	 * @return - Cookie parser
-	 */
-	public Cookie getCookie() {
-		return ((Cookie) parsers.get("Cookie"));
-	}
-
-	/**
-	 * Get content type with mime type name and boundary
-	 * @return - Content type
-	 */
-	public ContentType getContentType() {
-		return ((ContentType) parsers.get("Content-Type"));
-	}
-
-	/**
 	 * Get sending method type
 	 * @return - Method type
 	 */
@@ -324,6 +266,49 @@ public class Request {
 		return protocol;
 	}
 
+	/**
+	 * That class is extension of hash map with
+	 * received content type name
+	 */
+	public static class ContentType extends HashMap<String, String> {
+
+		/**
+		 * Get mime type of received content
+		 * @return - Received content mime type
+		 */
+		public String getName() {
+			return name;
+		}
+
+		private String name;
+	}
+
+	/**
+	 * Get collection with header's content type
+	 * @return - Content type parameters
+	 */
+	public ContentType getContentType() {
+		return contentType;
+	}
+
+	/**
+	 * Get collection with cookies
+	 * @return - Cookie parser
+	 */
+	public Map<String, String> getCookie() {
+		return cookie;
+	}
+
+	/**
+	 * Check is request sent via XMLHttpRequest
+	 * @return - True is request is ajax
+	 */
+	public boolean isAjax() {
+		return isAjax;
+	}
+
+	private boolean isAjax = false;
+
 	private Map<String, String> queryParameters
 			= new HashMap<>();
 
@@ -333,173 +318,13 @@ public class Request {
 	private Set<File> postFiles
 			= new HashSet<>();
 
+	private ContentType contentType
+			= new ContentType();
+
+	private Map<String, String> cookie
+			= new HashMap<>();
+
 	private Method method;
 	private String path;
 	private String protocol;
-
-	public static interface Parser extends Cloneable {
-
-		/**
-		 * Override that method to parser header's
-		 * row
-		 * @param body - String with header row's body
-		 */
-		public void parse(String body);
-	}
-
-	public static class CacheControl extends HashMap<String, String> implements Parser {
-
-		/**
-		 * That method will parse and store Cache-Control header's row
-		 * @param body - String with header row's body
-		 */
-		@Override
-		public void parse(String body) {
-			int index;
-			for (String s : body.split(",")) {
-				s = s.trim();
-				index = s.indexOf("=");
-				if (index != -1) {
-					put(s.substring(0, index), s.substring(index + 1));
-				} else {
-					put(s, null);
-				}
-			}
-		}
-	}
-
-	public static class ContentType extends HashMap<String, String> implements Parser {
-
-		/**
-		 * Override that method to parser header's row
-		 * @param body - String with header row's body
-		 */
-		@Override
-		public void parse(String body) {
-			String[] list = body.split(";");
-			if (list.length > 0) {
-				name = list[0];
-			}
-			for (int i = 1; i < list.length; i++) {
-				String[] split = list[i].trim().split("=");
-				if (split.length >= 2) {
-					put(split[0], split[1]);
-				} else {
-					put(split[0], null);
-				}
-			}
-		}
-
-		/**
-		 * Get content type name
-		 * @return - Content type name
-		 */
-		public String getName() {
-			return name;
-		}
-
-		private String name = null;
-	}
-
-	public static class Accept extends HashSet<String> implements Parser {
-
-		/**
-		 * That method will parse and store Accept header's row
-		 * @param body - String with header row's body
-		 */
-		@Override
-		public void parse(String body) {
-			for (String s : body.split(",")) {
-				add(s.trim());
-			}
-		}
-	}
-
-	public static class AcceptEncoding extends HashSet<String> implements Parser {
-
-		/**
-		 * That method will parse and store Accept-Encoding header's row
-		 * @param body - String with header row's body
-		 */
-		@Override
-		public void parse(String body) {
-			for (String s : body.split(",")) {
-				add(s.trim());
-			}
-		}
-	}
-
-	public static class AcceptLanguage extends HashSet<AcceptLanguage> implements Parser {
-
-		/**
-		 * That method will parser and store in map Accept-Language header's row
-		 * @param body - String with header row's body
-		 */
-		@Override
-		public void parse(String body) {
-			int index;
-			for (String s : body.split(",")) {
-				s = s.trim();
-				index = s.indexOf(";");
-				AcceptLanguage language = new AcceptLanguage();
-				if (index != -1) {
-					language.name = s.substring(0, index);
-					language.range = Integer.parseInt(s.substring(index + 1));
-				} else {
-					language.name = s;
-					language.range = 0;
-				}
-				add(language);
-			}
-		}
-
-		/**
-		 * Get parsed language's name (for sub-objects)
-		 * @return - Language's alias
-		 */
-		public String getName() {
-			return name;
-		}
-
-		/**
-		 * Get language's range. Default is 0
-		 * @return - Language range
-		 */
-		public int getRange() {
-			return range;
-		}
-
-		private String name;
-		private int range;
-	}
-
-	public static class Cookie extends HashMap<String, String> implements Parser {
-
-		/**
-		 * That method will parse cookies and store in itself
-		 * @param body - String with header row's body
-		 */
-		@Override
-		public void parse(String body) {
-			int index;
-			for (String s : body.split(";")) {
-				s = s.trim();
-				index = s.indexOf('=');
-				if (index != -1) {
-					put(s.substring(0, index), s.substring(index + 1));
-				} else {
-					put(s, null);
-				}
-			}
-		}
-	}
-
-	private Map<String, Parser> parsers = new HashMap<String, Parser>() {{
-		put("Cache-Control", new CacheControl());
-		put("Accept", new Accept());
-		put("Accept-Encoding", new AcceptEncoding());
-		put("Accept-Language", new AcceptLanguage());
-		put("Cookie", new Cookie());
-		put("Content-Type", new ContentType());
-	}};
 }

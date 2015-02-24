@@ -32,8 +32,8 @@ public class Session implements Runnable {
 	@Override
 	public void run() {
 
-		Response response = null;
 		OutputStream output = null;
+		Response response;
 		InputStream input = null;
 
 		try {
@@ -48,7 +48,6 @@ public class Session implements Runnable {
 			while ((read = input.read(chunk)) == chunk.length) {
 				stream.write(chunk, 0, read);
 			}
-
 			if (read > 0) {
 				stream.write(chunk, 0, read);
 			}
@@ -68,8 +67,13 @@ public class Session implements Runnable {
 
 		} catch (Exception e) {
 			try {
+				StringWriter writer = new StringWriter();
+				PrintWriter printer = new PrintWriter(writer);
+				e.printStackTrace(printer);
 				if ((output = output != null ? output : socket.getOutputStream()) != null) {
-					output.write(new Response(ResponseCode.INTERNAL_SERVER_ERROR, e.getMessage()).getResult());
+					output.write(new Response(ResponseCode.INTERNAL_SERVER_ERROR,
+						"<pre>" + writer.toString() + "</pre>").getResult()
+					);
 				}
 			} catch (IOException e2) {
 				e2.printStackTrace();
@@ -83,10 +87,9 @@ public class Session implements Runnable {
 			if (output != null) {
 				output.close();
 			}
-			if (!socket.isClosed()) {
-				socket.close();
-			}
-		} catch (Exception ignored) {
+			socket.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -167,7 +170,7 @@ public class Session implements Runnable {
 		System.out.println(message);
 		System.out.println("--------------");
 
-		if ("".equals(message)) {
+		if (message.equals("")) {
 			return new Response(ResponseCode.NO_CONTENT, "");
 		}
 
@@ -175,6 +178,12 @@ public class Session implements Runnable {
 
 		if (request.getMethod() == null) {
 			return new Response(ResponseCode.METHOD_NOT_ALLOWED);
+		}
+
+		if (!request.getProtocol().equalsIgnoreCase("HTTP/1.1") &&
+			!request.getProtocol().equalsIgnoreCase("HTTP/1.0")
+		) {
+			return new Response(ResponseCode.HTTP_VERSION_NOT_SUPPORTED);
 		}
 
 		if (Request.Method.POST.equals(request.getMethod()) ||
@@ -300,7 +309,7 @@ public class Session implements Runnable {
 			System.out.println("+++++++++++++++++++");
 
 			Map<String, String> disposition = parseHeaderString(
-				readHeaderRow(headers, "Content-Disposition"), ";"
+				readHeaderRow(headers, "Content-Disposition")
 			);
 
 			String contentType = readHeaderRow(headers, "Content-Type");
