@@ -5,8 +5,8 @@ import Core.AbstractLoader;
 import Core.ConfigLoader;
 import Core.EnvironmentManager;
 
-import java.io.IOException;
-import java.io.InterruptedIOException;
+import java.io.*;
+import java.io.File;
 import java.net.ServerSocket;
 import java.net.SocketException;
 
@@ -71,6 +71,18 @@ public class Server extends Thread implements Runnable {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Get server's document root
+	 * @return - Document root
+	 */
+	public String getDocumentRoot() {
+		String root = configLoader.getDefault("root", System.getProperty("user.dir"));
+		if (!root.endsWith(java.io.File.separator)) {
+			root = root + java.io.File.separator;
+		}
+		return root;
 	}
 
 	/**

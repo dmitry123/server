@@ -5,6 +5,7 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Request {
 
@@ -46,12 +47,20 @@ public class Request {
 			}
 			parseRow(header[i]);
 		}
-		if (Method.POST.equals(method) || Method.PUT.equals(method)) {
-			if (i < header.length) {
-				parsePost(header[i]);
-			}
+		if (getHeader().containsKey("X-Requested-With")) {
+			isAjax = getHeader().get("X-Requested-With").equals("XMLHttpRequest");
 		}
 	}
+
+	/**
+	 * Check is request sent via XMLHttpRequest
+	 * @return - True is request is ajax
+	 */
+	public boolean isAjax() {
+		return isAjax;
+	}
+
+	private boolean isAjax = false;
 
 	/**
 	 * Get special parser for specific
@@ -100,8 +109,8 @@ public class Request {
 	 * Parse post body and store it in post
 	 * parameters hash map
 	 */
-	private void parsePost(String path) {
-		parseLink(postParameters, path);
+	public void parsePost(String body) {
+		parseLink(postParameters, body);
 	}
 
 	/**
@@ -109,13 +118,13 @@ public class Request {
 	 * @param map - Map to store data (query or post)
 	 * @param link - String with parameters to parse
 	 */
-	private void parseLink(Map<String, String> map, String link) {
+	private static void parseLink(Map<String, String> map, String link) {
 		int sign;
 		for (String s : decode(link).split("&")) {
 			if ((sign = s.indexOf('=')) != -1) {
 				map.put(s.substring(0, sign), s.substring(sign +  1));
 			} else {
-				map.put(s, "");
+				map.put(s, null);
 			}
 		}
 	}
@@ -125,7 +134,7 @@ public class Request {
 	 * @param url - Url to decode
 	 * @return - Decoded url
 	 */
-	private String decode(String url) {
+	private static String decode(String url) {
 		try {
 			return URLDecoder.decode(url, "UTF-8");
 		} catch (UnsupportedEncodingException ignored) {
@@ -150,7 +159,32 @@ public class Request {
 			getParser(key).parse(body);
 		} catch (Exception ignored) {
 		}
+
+		header.put(key, body);
 	}
+
+	/**
+	 * Get request content length
+	 * @return - Length of request content
+	 */
+	public int getContentLength() {
+		if (getHeader().containsKey("Content-Length")) {
+			return Integer.parseInt(getHeader().get("Content-Length"));
+		} else {
+			return -1;
+		}
+	}
+
+	/**
+	 * Get parsed header information
+	 * @return - Map with parsed headers
+	 */
+	public Map<String, String> getHeader() {
+		return header;
+	}
+
+	private Map<String, String> header
+		= new HashMap<>();
 
 	/**
 	 * Get query parameter from request URL
@@ -179,6 +213,22 @@ public class Request {
 	}
 
 	/**
+	 * Get parameters sent via POST method
+	 * @return - Post parameters
+	 */
+	public Map<String, String> getPostParameters() {
+		return postParameters;
+	}
+
+	/**
+	 * Get files received from client side
+	 * @return - Map with server files
+	 */
+	public Set<File> getPostFiles() {
+		return postFiles;
+	}
+
+	/**
 	 * Get parameters sent via GET method
 	 * @return - Query parameters
 	 */
@@ -188,14 +238,6 @@ public class Request {
 			map.put(entry.getKey(), entry.getValue());
 		}
 		return map;
-	}
-
-	/**
-	 * Get parameters sent via POST method
-	 * @return - Post parameters
-	 */
-	public Map<String, String> getPostParameters() {
-		return postParameters;
 	}
 
 	/**
@@ -209,40 +251,6 @@ public class Request {
 		}
 		return map;
 	}
-
-	private Map<String, String> queryParameters
-			= new HashMap<>();
-
-	private Map<String, String> postParameters
-			= new HashMap<>();
-
-	/**
-	 * Get sending method type
-	 * @return - Method type
-	 */
-	public Method getMethod() {
-		return method;
-	}
-
-	/**
-	 * Get request path
-	 * @return - Request path
-	 */
-	public String getPath() {
-		return path;
-	}
-
-	/**
-	 * Get working request protocol
-	 * @return - Request protocol
-	 */
-	public String getProtocol() {
-		return protocol;
-	}
-
-	private Method method;
-	private String path;
-	private String protocol;
 
 	/**
 	 * Get collection with cache control header
@@ -284,6 +292,51 @@ public class Request {
 		return ((Cookie) parsers.get("Cookie"));
 	}
 
+	/**
+	 * Get content type with mime type name and boundary
+	 * @return - Content type
+	 */
+	public ContentType getContentType() {
+		return ((ContentType) parsers.get("Content-Type"));
+	}
+
+	/**
+	 * Get sending method type
+	 * @return - Method type
+	 */
+	public Method getMethod() {
+		return method;
+	}
+
+	/**
+	 * Get request path
+	 * @return - Request path
+	 */
+	public String getPath() {
+		return path;
+	}
+
+	/**
+	 * Get working request protocol
+	 * @return - Request protocol
+	 */
+	public String getProtocol() {
+		return protocol;
+	}
+
+	private Map<String, String> queryParameters
+			= new HashMap<>();
+
+	private Map<String, String> postParameters
+			= new HashMap<>();
+
+	private Set<File> postFiles
+			= new HashSet<>();
+
+	private Method method;
+	private String path;
+	private String protocol;
+
 	public static interface Parser extends Cloneable {
 
 		/**
@@ -304,6 +357,7 @@ public class Request {
 		public void parse(String body) {
 			int index;
 			for (String s : body.split(",")) {
+				s = s.trim();
 				index = s.indexOf("=");
 				if (index != -1) {
 					put(s.substring(0, index), s.substring(index + 1));
@@ -312,6 +366,39 @@ public class Request {
 				}
 			}
 		}
+	}
+
+	public static class ContentType extends HashMap<String, String> implements Parser {
+
+		/**
+		 * Override that method to parser header's row
+		 * @param body - String with header row's body
+		 */
+		@Override
+		public void parse(String body) {
+			String[] list = body.split(";");
+			if (list.length > 0) {
+				name = list[0];
+			}
+			for (int i = 1; i < list.length; i++) {
+				String[] split = list[i].trim().split("=");
+				if (split.length >= 2) {
+					put(split[0], split[1]);
+				} else {
+					put(split[0], null);
+				}
+			}
+		}
+
+		/**
+		 * Get content type name
+		 * @return - Content type name
+		 */
+		public String getName() {
+			return name;
+		}
+
+		private String name = null;
 	}
 
 	public static class Accept extends HashSet<String> implements Parser {
@@ -323,7 +410,7 @@ public class Request {
 		@Override
 		public void parse(String body) {
 			for (String s : body.split(",")) {
-				add(s);
+				add(s.trim());
 			}
 		}
 	}
@@ -352,6 +439,7 @@ public class Request {
 		public void parse(String body) {
 			int index;
 			for (String s : body.split(",")) {
+				s = s.trim();
 				index = s.indexOf(";");
 				AcceptLanguage language = new AcceptLanguage();
 				if (index != -1) {
@@ -412,5 +500,6 @@ public class Request {
 		put("Accept-Encoding", new AcceptEncoding());
 		put("Accept-Language", new AcceptLanguage());
 		put("Cookie", new Cookie());
+		put("Content-Type", new ContentType());
 	}};
 }

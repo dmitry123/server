@@ -64,10 +64,6 @@ public class Response {
 		System.arraycopy(builder.toString().getBytes(), 0, buffer, 0, builder.toString().length());
 		System.arraycopy(getResponseData(), 0, buffer, builder.toString().length(), getResponseData().length);
 
-//		System.out.println("------------------------------------");
-//		System.out.println(new String(buffer));
-//		System.out.println("------------------------------------");
-
 		return buffer;
 	}
 

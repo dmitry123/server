@@ -9,6 +9,13 @@ import java.util.Set;
 public class TemporaryFileManager implements FileManager {
 
 	/**
+	 * Construct temporary file manager
+	 */
+	public TemporaryFileManager() {
+		managers.add(this);
+	}
+
+	/**
 	 * Get path to temporary directory
 	 * @return - Path to temporary folder
 	 */
@@ -23,7 +30,7 @@ public class TemporaryFileManager implements FileManager {
 	 * @throws Exception
 	 */
 	public synchronized File create() throws Exception {
-		File file = File.createTempFile("Temporary", "File", new File(getDirectory()));
+		File file = File.createTempFile("Jaw", "", new File(getDirectory()));
 		files.add(file);
 		return file;
 	}
@@ -33,9 +40,7 @@ public class TemporaryFileManager implements FileManager {
 	 * temporary files after program exit
 	 */
 	public void cleanup() {
-		for (File file : getFiles()) {
-			file.delete();
-		}
+		getFiles().forEach(File::delete);
 	}
 
 	/**
@@ -46,19 +51,26 @@ public class TemporaryFileManager implements FileManager {
 		return files;
 	}
 
+	/**
+	 * Get default temporary file manager
+	 * @return - Temporary file manager
+	 */
+	public static TemporaryFileManager getDefaultManager() {
+		return defaultManager;
+	}
+
+	static private Set<TemporaryFileManager> managers
+			= new HashSet<>();
+
+	static private TemporaryFileManager defaultManager
+			= new TemporaryFileManager();
+
 	static {
-		Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-			@Override
-			public void run() {
-				for (TemporaryFileManager manager : managers) {
-					manager.cleanup();
-				}
-			}
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+			managers.forEach(Core.TemporaryFileManager::cleanup);
 		}));
 	}
 
-	static private Set<TemporaryFileManager> managers = new HashSet<TemporaryFileManager>();
-
 	private List<File> files
-		= new ArrayList<File>();
+		= new ArrayList<>();
 }
