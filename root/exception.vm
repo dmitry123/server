@@ -1,0 +1,8 @@
+<style>
+	body {
+		background-color: whitesmoke;
+		color: black;
+		font-size: 20px;
+	}
+</style>
+$trace

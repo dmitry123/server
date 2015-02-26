@@ -15,6 +15,9 @@
         <li><b>$file.getFileName()</b></li>
 	#end
 </ul>
+<br>
+<br>
+<br>
 <form id="test-form" method="post" enctype="multipart/form-data" action="index.vm">
 	<input type="text" value="Hello, World" name="value">
     <input type="text" value="ASdasd" name="test">

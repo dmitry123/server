@@ -70,10 +70,15 @@ public class Session implements Runnable {
 				StringWriter writer = new StringWriter();
 				PrintWriter printer = new PrintWriter(writer);
 				e.printStackTrace(printer);
+				String content = "<pre>" + writer.toString() + "</pre>";
+				try {
+					content = new String(DefaultListener.getVmFileContent(this,
+						getServer().getConfigLoader().getDefault("exception", "exception.vm"), content
+					));
+				} catch (Exception ignored) {
+				}
 				if ((output = output != null ? output : socket.getOutputStream()) != null) {
-					output.write(new Response(ResponseCode.INTERNAL_SERVER_ERROR,
-						"<pre>" + writer.toString() + "</pre>").getResult()
-					);
+					output.write(new Response(ResponseCode.INTERNAL_SERVER_ERROR, content).getResult());
 				}
 			} catch (IOException e2) {
 				e2.printStackTrace();
@@ -166,9 +171,9 @@ public class Session implements Runnable {
 	 */
 	private Response parseHeader(String message, byte[] body) throws Exception {
 
-		System.out.println("-----------------------");
-		System.out.println(message);
-		System.out.println("-----------------------");
+//		System.out.println("-----------------------");
+//		System.out.println(message);
+//		System.out.println("-----------------------");
 
 		if (message.equals("")) {
 			return new Response(ResponseCode.NO_CONTENT, "");
@@ -305,8 +310,8 @@ public class Session implements Runnable {
 			));
 			String[] headers = header.split("\r\n");
 
-			System.out.println(header);
-			System.out.println("+++++++++++++++++++");
+//			System.out.println(header);
+//			System.out.println("+++++++++++++++++++");
 
 			Map<String, String> disposition = parseHeaderString(
 				readHeaderRow(headers, "Content-Disposition")

@@ -12,6 +12,7 @@ public class DefaultListener implements SessionListener {
 	 * @param session - Current session instance
 	 * @return - Response message
 	 */
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	@Override
 	public Response process(Session session) throws Exception {
 
@@ -38,9 +39,7 @@ public class DefaultListener implements SessionListener {
 		}
 
 		if (getFileExtension(file.getName()).equals(".vm")) {
-			buffer = new VelocityRender(session.getNullEnvironment()).render(file.getName(), new HashMap<String, Object>() {{
-				put("request", session.getRequest());
-			}}).getBytes();
+			buffer = getVmFileContent(session, file.getName(), null);
 		}
 
 		// URLConnection.guessContentTypeFromName(file.getName());
@@ -50,6 +49,24 @@ public class DefaultListener implements SessionListener {
 		} else {
 			return new Response(ResponseCode.UNSUPPORTED_MEDIA_TYPE, "");
 		}
+	}
+
+	/**
+	 * Get rendered content of template velocity file
+	 * @param session - Current session
+	 * @param fileName - Name of velocity file
+	 * @return - Byte buffer with rendered template
+	 * @throws Exception
+	 */
+	public static byte[] getVmFileContent(Session session, String fileName, final String stackTrace) throws Exception {
+		return new VelocityRender(session.getNullEnvironment()).render(fileName,
+			new HashMap<String, Object>() {{
+				if (stackTrace != null) {
+					put("trace", stackTrace);
+				}
+				put("request", session.getRequest());
+			}}
+		).getBytes();
 	}
 
 	/**
