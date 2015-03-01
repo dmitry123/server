@@ -4,6 +4,7 @@ import org.json.JSONObject;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.util.HashMap;
 import java.util.Map;
 
 public class ConfigLoader extends AbstractLoader {
@@ -17,6 +18,43 @@ public class ConfigLoader extends AbstractLoader {
 	 */
 	public ConfigLoader(String fileName) throws Exception {
 		super(fileName);
+	}
+
+	/**
+	 * Get get for current operating system, you can simply
+	 * declare field as object with keys associated with
+	 * operating system name
+	 * @param key - Configuration key to find
+	 * @return - Object associated with that key or null
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T getSystemSpecific(String key) {
+		return getSystemSpecific(key, null);
+	}
+
+	/**
+	 * Get get for current operating system, you can simply
+	 * declare field as object with keys associated with
+	 * operating system name, where:
+	 *  + windows - Microsoft Windows
+	 *  + linux - Other
+	 * @param key - Configuration key to find
+ 	 * @param defaultValue - Default value if last is null
+	 * @return - Object associated with that key or null
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T getSystemSpecific(String key, T defaultValue) {
+		Object object = getOrDefault(key, defaultValue);
+		if (object instanceof Map) {
+			Map<String, Object> map = ((Map) object);
+			if (System.getProperty("os.name").contains("Windows")) {
+				return (T) map.getOrDefault("windows", defaultValue);
+			} else {
+				return (T) map.getOrDefault("linux", defaultValue);
+			}
+		} else {
+			return (T) object;
+		}
 	}
 
 	/**
@@ -35,7 +73,7 @@ public class ConfigLoader extends AbstractLoader {
 	 */
 	@Override
 	protected String getExtension() {
-		return "config";
+		return "json";
 	}
 
 	/**
@@ -61,10 +99,26 @@ public class ConfigLoader extends AbstractLoader {
 
 		stream.close();
 
-		JSONObject node = new JSONObject(new String(buffer));
+		buildJsonTree(map, new JSONObject(
+			new String(buffer)
+		));
+	}
 
-		for (String key : node.keySet()) {
-			map.put(key, node.get(key));
+	/**
+	 * Move all nodes from json object to hash map
+	 * @param destination - Destination map
+	 * @param source - Source node
+	 */
+	private void buildJsonTree(Map<String, Object> destination, JSONObject source) {
+		for (String key : source.keySet()) {
+			Object object = source.get(key);
+			if (object instanceof JSONObject) {
+				Map<String, Object> temp = new HashMap<>();
+				buildJsonTree(temp, (JSONObject) object);
+				destination.put(key, temp);
+			} else {
+				destination.put(key, source.get(key));
+			}
 		}
 	}
 

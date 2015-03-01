@@ -18,7 +18,7 @@
 <br>
 <br>
 <br>
-<form id="test-form" method="post" enctype="multipart/form-data" action="index.vm">
+<form id="test-form" method="post" enctype="multipart/form-data" action="index.html">
 	<input type="text" value="Hello, World" name="value">
     <input type="text" value="ASdasd" name="test">
 	<input type="file" accept="*/*" name="file" multiple>

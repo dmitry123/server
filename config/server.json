@@ -1,0 +1,8 @@
+{
+  "exception": "exception.vm",
+  "port": 9999,
+  "root": {
+    "linux": "/Volumes/Storage/Code/Java/Generator/root",
+    "windows": "D:\\code\\Java\\Generator\\root"
+  }
+}

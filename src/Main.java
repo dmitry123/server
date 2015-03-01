@@ -1,5 +1,7 @@
 import Server.*;
 
+//import java.util.Map;
+
 public class Main implements SessionListener {
 
 	/**
@@ -9,6 +11,9 @@ public class Main implements SessionListener {
 	 */
 	@SuppressWarnings({"unchecked", "ConstantConditions"})
 	public static void main(String[] arguments) throws Exception {
+//		for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
+//			System.out.println(entry.getKey() + " : " + entry.getValue());
+//		}
 		Server server = new Server(null, "server");
 		server.start();
 		try {

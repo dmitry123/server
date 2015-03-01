@@ -9,6 +9,7 @@ import java.io.*;
 import java.io.File;
 import java.net.ServerSocket;
 import java.net.SocketException;
+import java.util.Map;
 
 public class Server extends Thread implements Runnable {
 
@@ -50,11 +51,11 @@ public class Server extends Thread implements Runnable {
 				configLoader.getDefault("port", PORT)
 			);
 
-			System.out.format("Starting Server At %d Port\n", serverSocket.getLocalPort());
-
 			if (serverSocket.isClosed()) {
 				throw new Exception("Can't open server socket");
 			}
+
+			System.out.format("Starting Server At %d Port\n", serverSocket.getLocalPort());
 
 			do {
 				try {
@@ -78,7 +79,7 @@ public class Server extends Thread implements Runnable {
 	 * @return - Document root
 	 */
 	public String getDocumentRoot() {
-		String root = configLoader.getDefault("root", System.getProperty("user.dir"));
+		String root = configLoader.getSystemSpecific("root", System.getProperty("user.dir"));
 		if (!root.endsWith(java.io.File.separator)) {
 			root = root + java.io.File.separator;
 		}

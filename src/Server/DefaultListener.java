@@ -16,7 +16,7 @@ public class DefaultListener implements SessionListener {
 	@Override
 	public Response process(Session session) throws Exception {
 
-		String folder = session.getServer().getConfigLoader().getDefault("root", System.getProperty("user.dir"));
+		String folder = session.getServer().getDocumentRoot();
 		java.io.File file = new java.io.File(folder + session.getRequest().getPath());
 
 		if (!file.exists()) {
